@@ -154,9 +154,47 @@ def is_human(current_player: str, game_type: str) -> bool:
     """
 
     # Complete the body of this function.
+    return not (game_type == HUMAN_COMPUTER and current_player == PLAYER_TWO)
+
+
+def is_one_player_game(game_type: str) -> bool:
+    """Return True if and only if the type of game being played 
+    is a one-player game.
     
-def is_bonus_letter(view: str, letter: str, message: str) -> bool:
-    """Return True if and if the second argument letter is hidden and a consonants.
+    game_type is HUMAN, HUMAN_HUMAN, or HUMAN_COMPUTER.
+
+    >>> is_one_player_game("P1")
+    True
+    >>> is_one_player_game("PVP")
+    False
+    >>> is_one_player_game("PVE")
+    False
+    """
+
+    return game_type == HUMAN
+
+
+def current_player_score(p1_score: int,
+                         p2_score: int,
+                         current_player: str) -> int:
+    """Return the score of the current player.
+
+    >>> current_player_score(3, 5, "Player One")
+    3
+    >>> current_player_score(3, 5, "Player Two")
+    5
+    """
+
+    if current_player == PLAYER_ONE:
+        return p1_score
+    return p2_score
+
+    
+def is_bonus_letter(view: str,
+                    letter: str,
+                    message: str) -> bool:
+    """Return True if and if the second argument letter 
+    is hidden and a consonants.
     
     >>> is_bonus_letter("a^^le", "p", "apple")
     True
@@ -166,15 +204,18 @@ def is_bonus_letter(view: str, letter: str, message: str) -> bool:
     True  
     """
 
-    for i in view:
-        if view[i] == HIDDEN:
-            if letter == message[i] and letter in ALL_CONSONANTS:
-                return True
+    for i in range(len(view)):
+        if (view[i] == HIDDEN
+                and letter == message[i]
+                and letter in ALL_CONSONANTS):
+            return True
     return False
     
-                
-            
-def get_updated_char_view(view: str, message: str, updating_i: int, letter: str) -> str:
+                      
+def get_updated_char_view(view: str,
+                          message: str,
+                          updating_i: int,
+                          letter: str) -> str:
     """Return The function returns a single character string that is
     the updated view of that one character: if the guess is correct, the
     updated view should be the revealed character; otherwise it should
@@ -192,14 +233,121 @@ def get_updated_char_view(view: str, message: str, updating_i: int, letter: str)
     "appl^"
     """
 
-    if view[updating_i] == HIDDEN:
-        if letter == message[updating_i]:
-            return view[:updating_i] + message[updating_i] + view[updating_i + 1:]
-    return view
+    if view[updating_i] != HIDDEN:
+        return view[updating_i]
+    elif letter == message[updating_i]:
+        return letter
+    return HIDDEN
 
 
-def calculate_score()
+def calculate_score(score: int, occurrences: int, move: str) -> int:
+    """Return the updated score depending on the player's current move.
 
+    Precondition: move == CONSONANT or move == VOWEL
+
+    >>> calculate_score(3, 3, "V")
+    2
+    >>> calculate_score(3, 1, "C")
+    4
+    >>> calculate_score(3, 0, "C")
+    3
+    """
+
+    if move == VOWEL:
+        return score - VOWEL_COST
+    else:
+        return score + occurrences
+    
+
+def next_player(current_player: str, occurences: int, game_type: str) -> str:
+    """Return the player to play the next turn according to the game type.
+
+    >>> next_player("Player One", 1, 'P1")
+    "Player One"
+    >>> next_player("Player One", 0, 'PVP")
+    "Player Two"
+    >>> next_player("Player One", 2, 'PVP")
+    "Player One"
+    >>> next_player("Player One", 0, 'PVE")
+    "Player Two"
+    """
+
+    if game_type == HUMAN or occurences != 0:
+        return current_player
+    elif current_player == PLAYER_ONE:
+        return PLAYER_TWO
+    else:
+        return PLAYER_ONE
+    
+
+def is_fully_hidden(view: str,index: int, message: str) -> bool:
+    """Return True if and only if the character at the given index of 
+    the message is not revealed anywhere in the current view.
+
+    Precondition: 0 <= updating_i <= len(message)
+
+    >>> is_fully_hidden("Hel^^", 3, "Hello")
+    False
+    >>> is_fully_hidden("Hel^^", 4, "Hello")
+    True
+    >>> is_fully_hidden("A^^le" 1, "Apple")
+    True
+    >>> is_fully_hidden("Ap^le" 2, "Apple")
+    False
+    """
+    
+    for char in view:
+        if char == message[index]:
+            return False
+    return True
+
+def computer_chooses_solve(view: str,
+                           difficulty: str,
+                           consonants_not_guessed: str) -> bool:
+    """Return True if and if only if the computer choose to solve,
+    while the strategy depends on the difficulty of the game.
+    
+    HARD: The computer solve if at least half of the letters have been revealed
+    or if there are no more consonants to guess
+    
+    EASY: The computer only solve if therre is no more consonants to choose from
+    
+    >>> computer_chooses_solve("H^ppy", "E", "")
+    True
+    >>> computer_chooses_solve("H^ppy", "H", "")
+    True
+    >>> computer_chooses_solve("H^^^y", "E", "p")
+    False
+    >>> computer_chooses_solve("Ha^^y", "H", "p")
+    True
+    """
+    if consonants_not_guessed == "":
+        return True
+    if difficulty == HARD:
+        return half_revealed(view)
+    return False
+
+def remove_at_index(letters: str, index: int) -> str:
+    """Return the string of letters that the charaters at 
+    location [index] is removed.If the index numberis 
+    outside the range, return the oringial letters.
+
+    Precondition: index >= 0
+
+    >>> remove_at_index("aeiou", 1)
+    "aiou"
+    >>> remove_at_index("bcdfghjklmnpqrstvwxyz", 1)
+    "bdfghjklmnpqrstvwxyz"
+    >>> remove_at_index("aeiou", 5)
+    "aeiou"
+    """
+
+    if index > len(letters):
+        return letters
+    else:
+        return letters[:index] + letters[index + 1:]
+    
+    
 # Now define the other functions described in the handout.
 # Follow the Function Design Recipe to produce complete functions for
 # is_one_player_game, current_player_score, is_bonus_letter, 
