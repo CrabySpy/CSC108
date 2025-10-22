@@ -399,17 +399,24 @@ def clean_span_data(raw_spans: str) -> list[float]:
     """
     sums = 0.0
     result = []
-    total = float(raw_spans[6:8])
-    span = raw_spans[10:]
+    space = raw_spans.find(" ")
+
+    total = float(raw_spans[6:space])
+    span = raw_spans[space + 2:]
 
     while sums < total:
-        span_num = float(span[4:6])
+        start_i = span.find("=")
+        end_i = span.find(";")
+
+        span_num = float(span[start_i + 1:end_i])
+
         sums += span_num
         result.append(span_num)
 
-        span = span[7:]
+        span = span[end_i + 1:]
     
     return result
+
 
 def clean_bci_data(bci_years: list[str], start_year: int, 
                    bci_scores: list) -> None:
