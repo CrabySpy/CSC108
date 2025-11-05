@@ -1,0 +1,48 @@
+5090
+Increasing Students' Engagement to Reminder Emails
+
+2022-08-02
+Yanez,Fernando
+Zavaleta-Bernuy,Angela
+
+Our metric of interest is open email rates.
+END
+03221
+Stargazer: An Interactive Camera Robot for How-To Videos
+2023-03-01
+2023-03-06
+Grossman,Tovi
+
+We present Stargazer, a novel approach for assisting with tutorial content creation.
+END
+0001
+Cats and Dogs Can Co-Exist
+2023-08-20
+2023-10-02
+Smith,Jacqueline E.
+Sharmin,Sadia
+
+We show a formal proof that cats and dogs
+can peacefully co-exist!
+END
+108
+CSC108 is the Best Course Ever
+2023-09-01
+
+Smith,Jacqueline E.
+Zavaleta-Bernuy,Angela 
+Campbell,Jen
+
+We present clear evidence that Introduction to
+Computer Programming is the best course
+END
+42
+
+2023-05-04
+2023-05-05
+
+This is a strange article with no title
+and no authors.
+
+It also has a blank line in its abstract!
+END
