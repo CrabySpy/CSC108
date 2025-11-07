@@ -122,6 +122,7 @@ def created_in_year(metadata: ArxivType, article_id: str, published_year: int) -
     >>> created_in_year(example_arxiv, "323", 2023)
     False
     """
+
     year = 0
 
     if article_id in metadata:
@@ -136,41 +137,84 @@ def contains_keyword(metadata: ArxivType, keyword: str) -> list[str]:
     in their title, author names, and/or abstract. 
 
     >>> example_arxiv = EXAMPLE_ARXIV
-
+    >>> contains_keyword(example_arxiv, "is")
+    ['108', '42', '5090']
+    >>> example_arxiv = EXAMPLE_ARXIV
+    >>> contains_keyword(example_arxiv, "apple")
+    []
     """
+
     result = []
-    for article in metadata:
-        if article not in result:
-            title_words = article[TITLE].split()
-            authors_words = []
-            # for author in AUTHORS:
-            #     for name in author:
+    for article_key in metadata:
+        if metadata[article_key][ID] not in result:
+            
+            words = create_list_of_words(metadata, article_key)
+            clean_list_of_words(words)
+            
+            if keyword in words:
+                result.append(metadata[article_key][ID])
 
-            abstract_words = article[ABSTRACT].split()
+    result.sort()
 
-            if keyword in abstract_words or keyword in title_words or keyword in authors_words:
-                result.append(article[ID])
-                    
+    return result
+
+def create_list_of_words(metadata: ArxivType, article_key: str) -> list[str]:
+    """Return a list of words contain all words from the article's title, author names, and abstract."""
+
+    title_words = metadata[article_key][TITLE].split()
+
+    authors_words = []
+    for author in metadata[article_key][AUTHORS]:
+        for name in author:
+            authors_words.append(name)
+
+    abstract_words = metadata[article_key][ABSTRACT].split()
+
+    all_words = title_words + authors_words + abstract_words
+
+    return all_words
+
+def clean_list_of_words(words: list[str]) -> None:
+    """Clean all words in list words with all non-alphabetic characters removed and converted to 
+    lowercase.
+    
+    >>> words = ['Hello!!!', '12cat.dog?', "DON'T"]
+    >>> clean_list_of_words(words)
+    >>> words
+    ['hello', 'catdog', 'dont']
+
+    >>> words = ['ABC-d123', '000', '']
+    >>> clean_list_of_words(words)
+    >>> words
+    ['abcd', '', '']
+    """
+
+    for i in range(len(words)):
+        words[i] = clean_word(words[i])
+    
 def average_author_count(metadata: ArxivType,) -> float:
-    """Return the average number of authors per article in the arxiv metadata."""
+    """Return the average number of authors per article in the arxiv metadata.
+    
+    >>> example_arxiv = EXAMPLE_ARXIV
+    >>> average_author_count(example_arxiv)
+    1.6
+    >>> example_arxiv = EXAMPLE_ARXIV
+    >>> average_author_count(example_arxiv)
+    1.6
+    """
 
     num_of_article = 0
     num_of_authors = 0
     
-    for article in metadata:
+    for article_key in metadata:
         num_of_article += 1
-        for author in metadata[AUTHORS]:
+        for author in metadata[article_key][AUTHORS]:
             num_of_authors += 1
 
     if num_of_article == 0:
         return 0.0
     
     return num_of_authors / num_of_article
-
-# The first parameter represents arxiv metadata, the second parameter is an article ID, and the third parameter is a year. 
-# This function should return True if and only if an article with the provided id occurs in the metadata and was published in the 
-# given year. Hint: Think about what the function should return if this ID is not found in the metadata or if the 
-# article doesn't have a recorded created in date.
 
 ###############################################################################
 # Task 2 - Reading in the arxiv metadata
@@ -246,34 +290,33 @@ def keep_prolific_authors(id_to_article: ArxivType,
 
 
 if __name__ == '__main__':
-    import doctest
-    doctest.testmod()
+
     pass  # do not delete or comment out this line
 
     # uncomment the lines below to run doctest on your code
     # note that doctest requires your docstring examples to be perfectly
     # formatted, and we will not be running doctest on your code
-    #import doctest
-    #doctest.testmod()
+    import doctest
+    doctest.testmod()
 
     # uncomment the lines below to work with the small data set
-    #example_data = open('example_data.txt')
-    #example_arxiv = read_arxiv_file(example_data)
-    #example_data.close()
-    #if example_arxiv == EXAMPLE_ARXIV:
-        #print('The dict returned by read_arxiv_file matches EXAMPLE_ARXIV!')
-        #print('This is a good sign, but do more of your own testing!')
-    #else:
-        ## If you are getting this message, try setting a breakpoint on the line
-        ## that calls read_arxiv_file above and running the debugger
-        #print('Not quite! You got:')
-        #pprint.pprint(example_arxiv)
-        #print()
-        #print('If you are getting this message, then the dictionary produced')
-        #print('by your read_arxiv_file function does not match the provided')
-        #print('EXAMPLE_ARXIV. Scroll up to see the dictionary your function')
-        #print('produced. You may want to write more testing code to help')
-        #print('figure out why it does not match.')
+    # example_data = open('example_data.txt')
+    # example_arxiv = read_arxiv_file(example_data)
+    # example_data.close()
+    # if example_arxiv == EXAMPLE_ARXIV:
+    #     print('The dict returned by read_arxiv_file matches EXAMPLE_ARXIV!')
+    #     print('This is a good sign, but do more of your own testing!')
+    # else:
+    #     # If you are getting this message, try setting a breakpoint on the line
+    #     # that calls read_arxiv_file above and running the debugger
+    #     print('Not quite! You got:')
+    #     pprint.pprint(example_arxiv)
+    #     print()
+    #     print('If you are getting this message, then the dictionary produced')
+    #     print('by your read_arxiv_file function does not match the provided')
+    #     print('EXAMPLE_ARXIV. Scroll up to see the dictionary your function')
+    #     print('produced. You may want to write more testing code to help')
+    #     print('figure out why it does not match.')
 
 
     # uncomment the lines below to work with a larger data set
